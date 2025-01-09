@@ -5,6 +5,9 @@ using UnityEngine.Playables;
 using UnityEngine.Animations;
 using System;
 
+/// <summary>
+/// 自定义的脚本Playable
+/// </summary>
 public partial class SimpleAnimationPlayable : PlayableBehaviour
 {
     LinkedList<QueuedState> m_StateQueue;
@@ -124,6 +127,12 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         return newState;
     }
 
+    /// <summary>
+    /// 添加动画
+    /// </summary>
+    /// <param name="clip"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public bool AddClip(AnimationClip clip, string name)
     {
         StateInfo state = m_States.FindState(name);

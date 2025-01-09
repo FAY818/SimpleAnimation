@@ -4,9 +4,17 @@ using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.Playables;
 
+/// <summary>
+/// 1.动画播放相关的方法
+/// 2.动画状态相关的方法
+/// 3.动画设置相关方法
+/// </summary>
 [RequireComponent(typeof(Animator))]
 public partial class SimpleAnimation: MonoBehaviour
 {
+    /// <summary>
+    /// 动画状态相关信息接口，这个和SimpleAnimationPlayable中的IState对应
+    /// </summary>
     public interface State
     {
         bool enabled { get; set; }
@@ -19,7 +27,6 @@ public partial class SimpleAnimation: MonoBehaviour
         float length { get; }
         AnimationClip clip { get; }
         WrapMode wrapMode { get; set; }
-
     }
     public Animator animator
     {
@@ -33,12 +40,18 @@ public partial class SimpleAnimation: MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 动画更新是否是与物理系统的固定更新（FixedUpdate）同步。
+    /// </summary>
     public bool animatePhysics
     {
         get { return m_AnimatePhysics; }
         set { m_AnimatePhysics = value; animator.updateMode = m_AnimatePhysics ? AnimatorUpdateMode.AnimatePhysics : AnimatorUpdateMode.Normal; }
     }
 
+    /// <summary>
+    /// 动画的裁剪模式
+    /// </summary>
     public AnimatorCullingMode cullingMode
     {
         get { return animator.cullingMode; }
@@ -63,12 +76,15 @@ public partial class SimpleAnimation: MonoBehaviour
         }  
     }
 
+    /// <summary>
+    /// 动画循环模式
+    /// </summary>
     public WrapMode wrapMode
     {
         get { return m_WrapMode; }
         set { m_WrapMode = value; }
     }
-
+    
     public void AddClip(AnimationClip clip, string newName)
     {
         LegacyClipCheck(clip);
@@ -116,6 +132,9 @@ public partial class SimpleAnimation: MonoBehaviour
         m_Playable.Stop(stateName);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void Sample()
     {
         m_Graph.Evaluate();
@@ -132,6 +151,11 @@ public partial class SimpleAnimation: MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// 添加动画片段后重建状态机
+    /// </summary>
+    /// <param name="clip"></param>
+    /// <param name="name"></param>
     public void AddState(AnimationClip clip, string name)
     {
         LegacyClipCheck(clip);
@@ -140,7 +164,6 @@ public partial class SimpleAnimation: MonoBehaviour
         {
             RebuildStates();
         }
-        
     }
 
     public void RemoveState(string name)
@@ -189,6 +212,11 @@ public partial class SimpleAnimation: MonoBehaviour
         m_Playable.Rewind(stateName);
     }
 
+    /// <summary>
+    /// 获取当前状态，涉及不同的State类型转换
+    /// </summary>
+    /// <param name="stateName"></param>
+    /// <returns></returns>
     public State GetState(string stateName)
     {
         SimpleAnimationPlayable.IState state = m_Playable.GetState(stateName);
@@ -198,11 +226,19 @@ public partial class SimpleAnimation: MonoBehaviour
         return new StateImpl(state, this);
     }
 
+    /// <summary>
+    /// 获取状态集合
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<State> GetStates()
     {
         return new StateEnumerable(this);
     }
 
+    /// <summary>
+    /// 状态索引器
+    /// </summary>
+    /// <param name="name"></param>
     public State this[string name]
     {
         get { return GetState(name); }

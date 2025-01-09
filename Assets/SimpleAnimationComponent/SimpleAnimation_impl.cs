@@ -7,10 +7,17 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
 
+/// <summary>
+/// 
+/// </summary>
 [RequireComponent(typeof(Animator))]
 public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
 {
     const string kDefaultStateName = "Default";
+    
+    /// <summary>
+    /// State的集合类，对外提供一个用以遍历的迭代器
+    /// </summary>
     private class StateEnumerable : IEnumerable<State>
     {
         private SimpleAnimation m_Owner;
@@ -29,10 +36,13 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
             return new StateEnumerator(m_Owner);
         }
 
+        /// <summary>
+        /// State迭代器
+        /// </summary>
         class StateEnumerator : IEnumerator<State>
         {
             private SimpleAnimation m_Owner;
-            private IEnumerator<SimpleAnimationPlayable.IState> m_Impl;
+            private IEnumerator<SimpleAnimationPlayable.IState> m_Impl ;
             public StateEnumerator(SimpleAnimation owner)
             {
                 m_Owner = owner;
@@ -62,17 +72,21 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
             }
         }
     }
+    
+    /// <summary>
+    /// SimpleAnimation的State实现类，是对于SimpleAnimationPlayable中的State的封装
+    /// </summary>
     private class StateImpl : State
     {
+        private SimpleAnimationPlayable.IState m_StateHandle; // SimpleAnimationPlayable中的State句柄
+        private SimpleAnimation m_Component;
+        
         public StateImpl(SimpleAnimationPlayable.IState handle, SimpleAnimation component)
         {
             m_StateHandle = handle;
             m_Component = component;
         }
-
-        private SimpleAnimationPlayable.IState m_StateHandle;
-        private SimpleAnimation m_Component;
-
+        
         bool State.enabled
         {
             get { return m_StateHandle.enabled; }
@@ -137,6 +151,9 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         }
     }
 
+    /// <summary>
+    /// 用以编辑的状态类
+    /// </summary>
     [System.Serializable]
     public class EditorState
     {
@@ -145,6 +162,9 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         public bool defaultState;
     }
 
+    /// <summary>
+    /// 触发动画播放
+    /// </summary>
     protected void Kick()
     {
         if (!m_IsPlaying)
@@ -176,10 +196,10 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
     protected WrapMode m_WrapMode;
 
     [SerializeField]
-    protected AnimationClip m_Clip;
+    protected AnimationClip m_Clip; // 默认动画片段
 
     [SerializeField]
-    private EditorState[] m_States;
+    private EditorState[] m_States; // Inspector中可可编辑状态
 
     protected virtual void OnEnable()
     {
@@ -221,18 +241,18 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         m_Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
         SimpleAnimationPlayable template = new SimpleAnimationPlayable();
 
-        var playable = ScriptPlayable<SimpleAnimationPlayable>.Create(m_Graph, template, 1);
+        var playable = ScriptPlayable<SimpleAnimationPlayable>.Create(m_Graph, template, 1); // 自定义脚本
         m_Playable = playable.GetBehaviour();
         m_Playable.onDone += OnPlayableDone;
         if (m_States == null)
         {
+            // 创建一个默认的状态
             m_States = new EditorState[1];
             m_States[0] = new EditorState();
             m_States[0].defaultState = true;
             m_States[0].name = "Default";
         }
-
-
+        
         if (m_States != null)
         {
             foreach (var state in m_States)
@@ -252,6 +272,9 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         m_Initialized = true;
     }
 
+    /// <summary>
+    /// 保证有一个Default状态
+    /// </summary>
     private void EnsureDefaultStateExists()
     {
         if ( m_Playable != null && m_Clip != null && m_Playable.GetState(kDefaultStateName) == null )
@@ -280,6 +303,9 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         m_IsPlaying = false;
     }
 
+    /// <summary>
+    /// 根据playableStates中的状态重建可编辑状态
+    /// </summary>
     private void RebuildStates()
     {
         var playableStates = GetStates();
@@ -294,6 +320,7 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         m_States = list.ToArray();
     }
 
+    // 创建默认状态
     EditorState CreateDefaultEditorState()
     {
         var defaultState = new EditorState();
@@ -304,6 +331,9 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         return defaultState;
     }
 
+    /// <summary>
+    /// 检测是否是Legacy动画
+    /// </summary>
     static void LegacyClipCheck(AnimationClip clip)
     {
         if (clip && clip.legacy)
@@ -317,6 +347,9 @@ public partial class SimpleAnimation: MonoBehaviour, IAnimationClipSource
         Debug.LogErrorFormat(this.gameObject,"Animation clip {0} in state {1} is Legacy. Set clip.legacy to false, or reimport as Generic to use it with SimpleAnimationComponent", clipName, stateName);
     }
 
+    /// <summary>
+    /// 有效性检测，主要和默认动画相关
+    /// </summary>
     private void OnValidate()
     {
         //Don't mess with runtime data
