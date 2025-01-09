@@ -449,13 +449,18 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         }
         private bool m_Fading;
 
-        
+        /// <summary>
+        /// 融合的目标权重
+        /// </summary>
         public float targetWeight
         {
             get { return m_TargetWeight; }
         }
         private float m_TargetWeight;
 
+        /// <summary>
+        /// 当前动画权重
+        /// </summary>
         public float weight
         {
             get { return m_Weight; }

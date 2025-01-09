@@ -13,8 +13,12 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
     LinkedList<QueuedState> m_StateQueue;
     StateManagement m_States;
     bool m_Initialized;
+    AnimationMixerPlayable m_Mixer; // 动画混合器
+    public System.Action onDone = null;
 
-    bool m_KeepStoppedPlayablesConnected = true;
+    /// <summary>
+    /// 是否需要保持停止的Playable在图中的连接
+    /// </summary>
     public bool keepStoppedPlayablesConnected
     {
         get { return m_KeepStoppedPlayablesConnected; }
@@ -26,6 +30,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             }
         }
     }
+    bool m_KeepStoppedPlayablesConnected = true;
 
     void UpdateStoppedPlayablesConnections()
     {
@@ -46,15 +51,22 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             }
         }
     }
-
+    
+    protected Playable self
+    {
+        get { return m_ActualPlayable; }
+    }
     protected Playable m_ActualPlayable;
-    protected Playable self { get { return m_ActualPlayable; } }
-    public Playable playable { get { return self; } }
-    protected PlayableGraph graph { get { return self.GetGraph(); } }
+    public Playable playable
+    {
+        get { return self; }
+    }
 
-    AnimationMixerPlayable m_Mixer;
-
-    public System.Action onDone = null;
+    protected PlayableGraph graph
+    {
+        get { return self.GetGraph(); }
+    }
+    
     public SimpleAnimationPlayable()
     {
         m_States = new StateManagement();
@@ -104,7 +116,6 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         newState.Initialize(name, clip, clip.wrapMode);
         //Find at which input the state will be connected
         int index = newState.index;
-
         //Increase input count if needed
         if (index == m_Mixer.GetInputCount())
         {
@@ -493,6 +504,9 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         }
     }
 
+    /// <summary>
+    /// 检测动画结束
+    /// </summary>
     private void UpdateDoneStatus()
     {
         if (!m_States.AnyStatePlaying())
@@ -534,6 +548,10 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         graph.Disconnect(m_Mixer, index);
     }
 
+    /// <summary>
+    /// 将目标索引的状态机与混合器连接
+    /// </summary>
+    /// <param name="index"></param>
     private void ConnectInput(int index)
     {
         StateInfo state = m_States[index];
@@ -557,7 +575,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             //Update crossfade weight
             if (state.fading)
             {
-                state.SetWeight(Mathf.MoveTowards(state.weight, state.targetWeight, state.fadeSpeed *deltaTime));
+                state.SetWeight(Mathf.MoveTowards(state.weight, state.targetWeight, state.fadeSpeed * deltaTime));
                 if (Mathf.Approximately(state.weight, state.targetWeight))
                 {
                     state.ForceWeight(state.targetWeight);
@@ -632,6 +650,10 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         }
     }
 
+    /// <summary>
+    /// 计算当前状态队列中最长的剩余动画时间
+    /// </summary>
+    /// <returns></returns>
     private float CalculateQueueTimes()
     {
         float longestTime = -1f;
@@ -717,6 +739,9 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         }
     }
 
+    /// <summary>
+    /// 设置状态机时间过时
+    /// </summary>
     void InvalidateStateTimes()
     {
         int count = m_States.Count;
