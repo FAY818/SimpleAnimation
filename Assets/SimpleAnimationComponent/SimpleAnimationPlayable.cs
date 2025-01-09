@@ -744,6 +744,12 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         CleanClonedStates();
     }
 
+    /// <summary>
+    /// 检测输入点的有效性
+    /// </summary>
+    /// <param name="index">状态机索引</param>
+    /// <param name="input">输入播放点</param>
+    /// <returns></returns>
     public bool ValidateInput(int index, Playable input)
     {
         if (!ValidateIndex(index))
@@ -756,6 +762,11 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         return true;
     }
 
+    /// <summary>
+    /// 检测索引的有效性
+    /// </summary>
+    /// <param name="index">状态机索引</param>
+    /// <returns></returns>
     public bool ValidateIndex(int index)
     {
         return index >= 0 && index < m_States.Count;

@@ -5,11 +5,17 @@ using UnityEngine.Playables;
 using UnityEngine.Animations;
 using System;
 
+/// <summary>
+/// SimpleAnimationPlayable 中与State相关的部分
+/// </summary>
 public partial class SimpleAnimationPlayable : PlayableBehaviour
 {
-    private int m_StatesVersion = 0;
-
+    private int m_StatesVersion = 0; //todo ？
     private void InvalidateStates() { m_StatesVersion++; }
+    
+    /// <summary>
+    /// 状态机集合，可以遍历
+    /// </summary>
     private class StateEnumerable: IEnumerable<IState>
     {
         private SimpleAnimationPlayable m_Owner;
@@ -83,6 +89,9 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         }
     }
     
+    /// <summary>
+    /// 动画状态机属性定义接口
+    /// </summary>
     public interface IState
     {
         bool IsValid();
@@ -106,8 +115,22 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         WrapMode wrapMode { get; }
     }
 
+    /// <summary>
+    /// 动画状态机接口实现类，封装具体某个动画状态的相关属性
+    /// </summary>
     public class StateHandle : IState
     {
+        public int index { get { return m_Index; } }
+        private SimpleAnimationPlayable m_Parent;
+        private int m_Index;
+        private Playable m_Target;
+        
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="s">？</param>
+        /// <param name="index">状态索引</param>
+        /// <param name="target">目标可播放对像</param>
         public StateHandle(SimpleAnimationPlayable s, int index, Playable target)
         {
             m_Parent = s;
@@ -265,16 +288,21 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
                 return m_Parent.m_States.GetStateWrapMode(m_Index);
             }
         }
-
-        public int index { get { return m_Index; } }
-
-        private SimpleAnimationPlayable m_Parent;
-        private int m_Index;
-        private Playable m_Target;
     }
 
+    /// <summary>
+    /// 动画状态机相关的信息封装类
+    /// </summary>
     private class StateInfo
     {
+        private float m_Time; // 动画播放到的时间
+        private bool m_TimeIsUpToDate; //是否是最新时间
+        
+        public void InvalidateTime()
+        {
+            m_TimeIsUpToDate = false;
+        }
+        
         public void Initialize(string name, AnimationClip clip, WrapMode wrapMode)
         {
             m_StateName = name;
@@ -340,6 +368,10 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             }
         }
 
+        /// <summary>
+        /// 强制刷新动画权重
+        /// </summary>
+        /// <param name="weight"></param>
         public void ForceWeight(float weight)
         {
            m_TargetWeight = weight;
@@ -354,6 +386,11 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             m_WeightDirty = true;
         }
 
+        /// <summary>
+        /// 设置淡出的权重和速度
+        /// </summary>
+        /// <param name="weight"></param>
+        /// <param name="speed"></param>
         public void FadeTo(float weight, float speed)
         {
             m_Fading = Mathf.Abs(speed) > 0f;
@@ -369,6 +406,10 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             }
         }
 
+        /// <summary>
+        /// 标记为克隆状态机
+        /// </summary>
+        /// <param name="handle">克隆源</param>
         public void SetAsCloneOf(StateHandle handle)
         {
             m_ParentState = handle;
@@ -379,7 +420,6 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         {
             get { return m_Enabled; }
         }
-
         private bool m_Enabled;
 
         public int index
@@ -391,7 +431,6 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
                 m_Index = value;
             }
         }
-
         private int m_Index;
 
         public string stateName
@@ -399,38 +438,34 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             get { return m_StateName; }
             set { m_StateName = value; }
         }
-
         private string m_StateName;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool fading
         {
             get { return m_Fading; }
         }
-
         private bool m_Fading;
 
-
-        private float m_Time;
-
+        
         public float targetWeight
         {
             get { return m_TargetWeight; }
         }
-
         private float m_TargetWeight;
 
         public float weight
         {
             get { return m_Weight; }
         }
-
         float m_Weight;
 
         public float fadeSpeed
         {
             get { return m_FadeSpeed; }
         }
-
         float m_FadeSpeed;
 
         public float speed
@@ -448,7 +483,6 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         {
             get { return m_Clip; }
         }
-
         private AnimationClip m_Clip;
 
         public void SetPlayable(Playable playable)
@@ -462,14 +496,12 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         {
             get { return m_Playable; }
         }
-
         private Playable m_Playable;
 
         public WrapMode wrapMode
         {
             get { return m_WrapMode; }
         }
-
         private WrapMode m_WrapMode;
 
         //Clone information
@@ -477,50 +509,67 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         {
             get { return m_IsClone; }
         }
-
         private bool m_IsClone;
 
         public bool isReadyForCleanup
         {
             get { return m_ReadyForCleanup; }
         }
-
         private bool m_ReadyForCleanup;
 
+        /// <summary>
+        /// 克隆父，当前状态机的信息来源于父状态机，区别于节点和继承中的父子关系
+        /// </summary>
         public StateHandle parentState
         {
             get { return m_ParentState; }
         }
-
         public StateHandle m_ParentState;
 
-        public bool enabledDirty { get { return m_EnabledDirty; } }
-        public bool weightDirty { get { return m_WeightDirty; } }
+        // 标记Enabled是否被修改，无论是开启/关闭
+        public bool enabledDirty
+        {
+            get { return m_EnabledDirty; }
+        }
+        private bool m_EnabledDirty;
+
+        /// <summary>
+        /// 标记权重是否被修改
+        /// </summary>
+        public bool weightDirty
+        {
+            get { return m_WeightDirty; }
+        }
+        private bool m_WeightDirty;
 
         public void ResetDirtyFlags()
         { 
             m_EnabledDirty = false;
             m_WeightDirty = false;
         }
-
-        private bool m_WeightDirty;
-        private bool m_EnabledDirty;
-
-        public void InvalidateTime() { m_TimeIsUpToDate = false; }
-        private bool m_TimeIsUpToDate;
     }
 
+    /// <summary>
+    /// 将StateInfo中的信息转换到StateHandle对象中
+    /// </summary>
+    /// <param name="info"></param>
+    /// <returns></returns>
     private StateHandle StateInfoToHandle(StateInfo info)
     {
         return new StateHandle(this, info.index, info.playable);
     }
 
+    /// <summary>
+    /// StateInfo的统一管理类，通过索引可以访问每个状态的信息
+    /// </summary>
     private class StateManagement
     {
         private List<StateInfo> m_States;
 
-        public int Count { get { return m_Count; } }
-
+        public int Count
+        {
+            get { return m_Count; }
+        }
         private int m_Count;
 
         public StateInfo this[int i]
@@ -535,12 +584,12 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         {
             m_States = new List<StateInfo>();
         }
-
+        
         public StateInfo InsertState()
         {
             StateInfo state = new StateInfo();
 
-            int firstAvailable = m_States.FindIndex(s => s == null);
+            int firstAvailable = m_States.FindIndex(s => s == null); // 首个空闲位置
             if (firstAvailable == -1)
             {
                 firstAvailable = m_States.Count;
@@ -555,6 +604,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             m_Count++;
             return state;
         }
+        
         public bool AnyStatePlaying()
         {
             return m_States.FindIndex(s => s != null && s.enabled) != -1;
@@ -568,13 +618,18 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             m_Count = m_States.Count;
         }
 
+        /// <summary>
+        /// 移除 AnimationClip 及其对应状态机
+        /// </summary>
+        /// <param name="clip"></param>
+        /// <returns></returns>
         public bool RemoveClip(AnimationClip clip)
         {
             bool removed = false;
             for (int i = 0; i < m_States.Count; i++)
             {
                 StateInfo state = m_States[i];
-                if (state != null &&state.clip == clip)
+                if (state != null && state.clip == clip)
                 {
                     RemoveState(i);
                     removed = true;
@@ -608,7 +663,6 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         {
             StateInfo state = m_States[index];
             state.SetWeight(weight);
-           
         }
 
         public void SetStateTime(int index, float time)
@@ -623,6 +677,12 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             return state.GetTime();
         }
 
+        /// <summary>
+        /// 是否是从某个状态克隆的
+        /// </summary>
+        /// <param name="potentialCloneIndex">潜在的克隆状态机索引</param>
+        /// <param name="originalIndex">克隆源状态机索引/param>
+        /// <returns></returns>
         public bool IsCloneOf(int potentialCloneIndex, int originalIndex)
         {
             StateInfo potentialClone = m_States[potentialCloneIndex];
@@ -700,9 +760,11 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
                 m_States[index].Stop();
             }
         }
-
     }
 
+    /// <summary>
+    /// 可成队的状态机
+    /// </summary>
     private struct QueuedState
     {
         public QueuedState(StateHandle s, float t)
