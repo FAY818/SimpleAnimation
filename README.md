@@ -15,3 +15,4 @@ This is a sample that shows how to use Playable Graphs to animate objects in a m
 - StateManagement List的空闲位添加对象
 - 通过 partial 来分散定义类
 - bool的 |= 赋值运算 UpdateStates
+- 单元测试
