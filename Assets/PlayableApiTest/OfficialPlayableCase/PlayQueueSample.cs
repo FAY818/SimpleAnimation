@@ -2,15 +2,23 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
+/// <summary>
+/// 自定义播放行为
+/// </summary>
 public class PlayQueuePlayable : PlayableBehaviour
 {
     private int m_CurrentClipIndex = -1;
     private float m_TimeToNextClip;
     private Playable mixer;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="clipsToPlay">待播放的动画队列</param>
+    /// <param name="owner">播放行为的持有Playable对象</param>
+    /// <param name="graph"></param>
     public void Initialize(AnimationClip[] clipsToPlay, Playable owner, PlayableGraph graph)
     {
-
         owner.SetInputCount(1);
         mixer = AnimationMixerPlayable.Create(graph, clipsToPlay.Length);
         graph.Connect(mixer, 0, owner, 0);
@@ -21,7 +29,6 @@ public class PlayQueuePlayable : PlayableBehaviour
             graph.Connect(AnimationClipPlayable.Create(graph, clipsToPlay[clipIndex]), 0, mixer, clipIndex);
             mixer.SetInputWeight(clipIndex, 1.0f);
         }
-
     }
 
     public override void PrepareFrame(Playable owner, FrameData info)
@@ -49,7 +56,6 @@ public class PlayQueuePlayable : PlayableBehaviour
             if (clipIndex == m_CurrentClipIndex)
                 mixer.SetInputWeight(clipIndex, 1.0f);
             else
-
                 mixer.SetInputWeight(clipIndex, 0.0f);
         }
     }
@@ -63,14 +69,13 @@ public class PlayQueueSample : MonoBehaviour
 
     void Start()
     {
-
         playableGraph = PlayableGraph.Create();
         var playQueuePlayable = ScriptPlayable<PlayQueuePlayable>.Create(playableGraph);
         var playQueue = playQueuePlayable.GetBehaviour();
         playQueue.Initialize(clipsToPlay, playQueuePlayable, playableGraph);
+        
         var playableOutput = AnimationPlayableOutput.Create(playableGraph, "Animation", GetComponent<Animator>());
-        playableOutput.SetSourcePlayable(playQueuePlayable);
-        playableOutput.SetSourceInputPort(0);
+        playableOutput.SetSourcePlayable(playQueuePlayable, 0);
         playableGraph.Play();
     }
 

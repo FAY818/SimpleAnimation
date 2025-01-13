@@ -3,33 +3,32 @@ using UnityEngine.Playables;
 using UnityEngine.Animations;
 
 /// <summary>
-/// 创建动画混合树
+/// 混合 AnimationClip 和 AnimatorController
 /// </summary>
 [RequireComponent(typeof(Animator))]
-public class MixAnimationSample : MonoBehaviour
+public class RuntimeControllerSample : MonoBehaviour
 {
-    public AnimationClip clip0;
-    public AnimationClip clip1;
+    public AnimationClip clip;
+    public RuntimeAnimatorController controller;
     public float weight;
     PlayableGraph playableGraph;
     AnimationMixerPlayable mixerPlayable;
 
     void Start()
     {
-        // 创建一个空的 PlayableGraph
+        // 创建一个空的PlayableGraph
         playableGraph = PlayableGraph.Create();
-        // 创建输出节点
-        var playableOutput = AnimationPlayableOutput.Create(playableGraph,"AdamAnimator", GetComponent<Animator>());
-        // 创建混合器
+        var playableOutput = AnimationPlayableOutput.Create(playableGraph,"Animation", GetComponent<Animator>());
+
         mixerPlayable = AnimationMixerPlayable.Create(playableGraph, 2);
-        // 将混合器连接到输出
+
         playableOutput.SetSourcePlayable(mixerPlayable);
 
         // 创建 AnimationClipPlayable 并将它们连接到混合器。
-        var clipPlayable0 = AnimationClipPlayable.Create(playableGraph, clip0);
-        var clipPlayable1 = AnimationClipPlayable.Create(playableGraph, clip1);
-        playableGraph.Connect(clipPlayable0, 0, mixerPlayable, 0);
-        playableGraph.Connect(clipPlayable1, 0, mixerPlayable, 1);
+        var clipPlayable = AnimationClipPlayable.Create(playableGraph, clip);
+        var ctrlPlayable = AnimatorControllerPlayable.Create(playableGraph, controller);
+        playableGraph.Connect(clipPlayable, 0, mixerPlayable, 0);
+        playableGraph.Connect(ctrlPlayable, 0, mixerPlayable, 1);
         
         //播放该图。
         playableGraph.Play();
@@ -37,14 +36,13 @@ public class MixAnimationSample : MonoBehaviour
 
     void Update()
     {
-        // 设置权重
         weight = Mathf.Clamp01(weight);
         mixerPlayable.SetInputWeight(0, 1.0f-weight);
         mixerPlayable.SetInputWeight(1, weight);
     }
 
     void OnDisable()
-    { 
+    {
         //销毁该图创建的所有可播放项和输出。
         playableGraph.Destroy();
     }
