@@ -2,7 +2,7 @@
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace IrisFenrir.AnimationSystem
+namespace PlayableUtil.AnimationSystem
 {
     [System.Serializable]
     public struct BlendClip2D

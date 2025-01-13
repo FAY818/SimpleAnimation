@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Playables;
 
-namespace IrisFenrir.AnimationSystem
+namespace PlayableUtil.AnimationSystem
 {
     /// <summary>
     /// 动画多态节点的基类，可以根据不同的实现类对外表现出不同的行为

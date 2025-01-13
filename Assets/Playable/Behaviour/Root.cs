@@ -1,6 +1,6 @@
 ﻿using UnityEngine.Playables;
 
-namespace IrisFenrir.AnimationSystem
+namespace PlayableUtil.AnimationSystem
 {
     /// <summary>
     /// 根节点，用以隔离输出与播放节点，避免直接播放playable输入。

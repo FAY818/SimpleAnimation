@@ -1,6 +1,6 @@
 ﻿using UnityEngine.Playables;
 
-namespace IrisFenrir.AnimationSystem
+namespace PlayableUtil.AnimationSystem
 {
     /// <summary>
     /// 动画适配器节点，将继承的 PlayableBehaviour 接口和持有的自定义的AnimBehaviour类适配以实现节点的多态；

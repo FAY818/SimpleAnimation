@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Playables;
 
-namespace IrisFenrir.AnimationSystem
+namespace PlayableUtil.AnimationSystem
 {
     public class AnimUnitExample : MonoBehaviour
     {
@@ -21,7 +21,7 @@ namespace IrisFenrir.AnimationSystem
 
         private void Update()
         {
-            if(UnityEngine.Input.GetKeyDown(KeyCode.Space))
+            if(Input.GetKeyDown(KeyCode.Space))
             {
                 if (m_animUnit.enable)
                     m_animUnit.Disable();
