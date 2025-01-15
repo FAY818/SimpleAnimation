@@ -12,8 +12,13 @@ namespace PlayableUtil.AnimationSystem
 
         public override int Select()
         {
+            if (clipCount <= 1)
+            {
+                return 0;
+            }
+            
             currentIndex = Random.Range(0, clipCount);
             return currentIndex;
         }
-    }
+    } 
 }

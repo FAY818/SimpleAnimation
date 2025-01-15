@@ -5,9 +5,9 @@ namespace PlayableUtil.AnimationSystem
     /// <summary>
     /// 隔离输出与播放节点，避免直接播放playable输入。
     /// </summary>
-    public class Root : AdapterBase
+    public class AnimRoot : AdapterBase
     {
-        public Root(PlayableGraph graph) : base(graph)
+        public AnimRoot(PlayableGraph graph) : base(graph)
         {
 
         }

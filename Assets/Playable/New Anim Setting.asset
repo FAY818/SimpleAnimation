@@ -12,4 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99bce8c7c0a4e4e8ca97fa3618166a5b, type: 3}
   m_Name: New Anim Setting
   m_EditorClassIdentifier: 
-  animParams: []
+  animParams:
+  - name: Anim
+    type: 3
+    enterTime: 0
+    clip: {fileID: 0}
+    clipGroup: []
+    infoGroup: []
+    blendClip:
+    - clip: {fileID: 0}
+      pos: {x: 0, y: 0}

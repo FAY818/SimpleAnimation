@@ -4,18 +4,18 @@ using UnityEngine.Playables;
 namespace PlayableUtil.AnimationSystem
 {
     /// <summary>
-    /// 动画节点的行为类，可以根据不同的实现类对外表现出不同的行为
-    /// 负责创建适配节点，并将自身注入到适配节点中
+    /// 动画行为的基类，可以根据不同的实现对外表现出不同的行为。
+    /// 负责创建自定义的脚本适配节点（ScriptPlayable<AdapterPlayableBehaviour>），并将自身注入其行为类中。
     /// 注意区分此类与PlayableBehaviour的区别：
     /// PlayableBehaviour是Playable节点持有的行为类。其中定义的是在Playable不同的生命周期或行为发生时的回调函数。
-    /// AnimBehaviour是AnimAdapter（PlayableBehaviour）中封装的行为类
+    /// AdapterBase是AdapterPlayableBehaviour中封装的对象。
     /// </summary>
     public abstract class AdapterBase
     {
         public bool enable { get; private set; }
         public float remainTime { get; protected set; }
-        protected Playable m_adapterPlayable;
-        protected float m_enterTime;
+        protected Playable m_adapterPlayable; // 行为类中的Playable节点，
+        protected float m_enterTime; // todo : 这个时间暂时没有用处？
         protected float m_animLength;
 
         public AdapterBase(float enterTime = 0f)
@@ -26,7 +26,7 @@ namespace PlayableUtil.AnimationSystem
         public AdapterBase(PlayableGraph graph, float enterTime = 0f)
         {
             m_adapterPlayable = ScriptPlayable<AdapterPlayableBehaviour>.Create(graph); // 创建适配节点
-            AnimHelper.GetAdapter(m_adapterPlayable).Init(this); // 注入自己到适配节点
+            AnimHelper.AdapterPlayableBehaviour(m_adapterPlayable).Init(this); // 注入自己到适配节点
             m_enterTime = enterTime;
             m_animLength = float.NaN;
         }

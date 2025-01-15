@@ -8,7 +8,7 @@ namespace PlayableUtil.AnimationSystem
     /// <summary>
     /// 动画过渡混合器
     /// </summary>
-    public class Mixer : AdapterBase
+    public class AnimTransition : AdapterBase
     {
         public int inputCount { get; private set; }
         public int currentIndex => m_currentIndex;
@@ -28,7 +28,7 @@ namespace PlayableUtil.AnimationSystem
         private float m_declinedWeight;
         #endregion
 
-        public Mixer(PlayableGraph graph):base(graph)
+        public AnimTransition(PlayableGraph graph):base(graph)
         {
             m_animMixer = AnimationMixerPlayable.Create(graph, 0, true);
             m_adapterPlayable.AddInput(m_animMixer, 0, 1f);

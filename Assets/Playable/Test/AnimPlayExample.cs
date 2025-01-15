@@ -3,19 +3,19 @@ using UnityEngine.Playables;
 
 namespace PlayableUtil.AnimationSystem
 {
-    public class AnimUnitExample : MonoBehaviour
+    public class AnimPlayExample : MonoBehaviour
     {
         public AnimationClip clip;
 
         private PlayableGraph m_graph;
-        private AnimUnit m_animUnit;
+        private AnimPlayer m_AnimPlayer;
 
         // Use this for initialization
         void Start()
         {
             m_graph = PlayableGraph.Create();
-            m_animUnit = new AnimUnit(m_graph, clip);
-            AnimHelper.SetOutput(m_graph, GetComponent<Animator>(), m_animUnit);
+            m_AnimPlayer = new AnimPlayer(m_graph, clip);
+            AnimHelper.SetOutput(m_graph, GetComponent<Animator>(), m_AnimPlayer);
             AnimHelper.Start(m_graph);
         }
 
@@ -23,10 +23,10 @@ namespace PlayableUtil.AnimationSystem
         {
             if(Input.GetKeyDown(KeyCode.Space))
             {
-                if (m_animUnit.enable)
-                    m_animUnit.Disable();
+                if (m_AnimPlayer.enable)
+                    m_AnimPlayer.Disable();
                 else
-                    m_animUnit.Enable();
+                    m_AnimPlayer.Enable();
             }
         }
 

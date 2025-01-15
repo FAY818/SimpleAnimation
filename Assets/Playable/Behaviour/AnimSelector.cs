@@ -6,26 +6,27 @@ using UnityEngine.Playables;
 namespace PlayableUtil.AnimationSystem
 {
     /// <summary>
-    /// 动画选择器
+    /// 动画选择,通过索引来播放对应输入源的动画
     /// </summary>
     public class AnimSelector : AdapterBase
     {
-        public int currentIndex { get; protected set; } // 当前子节点
-        public int clipCount { get; protected set; } // 子节点数量
+        public int currentIndex { get; protected set; } // 当前动画clip的索引
+        public int clipCount { get; protected set; } 
 
-        private AnimationMixerPlayable m_mixer; // 原生动画混合器
-        private List<float> m_clipLength;
-        private List<float> m_clipEnterTime;
+        private AnimationMixerPlayable _mixerPlayable; // 动画混合器
+        private List<float> _clipLength;
+        private List<float> _clipEnterTime;
 
         public AnimSelector(PlayableGraph graph) : base(graph)
         {
-            m_mixer = AnimationMixerPlayable.Create(graph);
-            m_adapterPlayable.AddInput(m_mixer, 0, 1f);
+            _mixerPlayable = AnimationMixerPlayable.Create(graph);
+            m_adapterPlayable.AddInput(_mixerPlayable, 0, 1f); // 将自身的自定义可播放项与动画混合器连接
 
             currentIndex = -1;
-            m_clipLength = new List<float>();
-            m_clipEnterTime = new List<float>();
+            _clipLength = new List<float>();
+            _clipEnterTime = new List<float>();
         }
+        
         public AnimSelector(PlayableGraph graph, AnimParam param) : this(graph)
         {
             foreach (var clip in param.infoGroup)
@@ -36,16 +37,16 @@ namespace PlayableUtil.AnimationSystem
 
         public override void AddInput(Playable playable)
         {
-            base.AddInput(playable);
-            m_mixer.SetInputCount(clipCount + 1);
-            m_mixer.ConnectInput(clipCount, playable, 0, 0f);
+            base.AddInput(playable); // todo 检测是否是调用2遍
+            _mixerPlayable.SetInputCount(clipCount + 1);
+            _mixerPlayable.ConnectInput(clipCount, playable, 0, 0f);
             clipCount++;
         }
         public void AddInput(AnimationClip clip, float enterTime = 0f)
         {
-            m_clipLength.Add(clip.length);
-            m_clipEnterTime.Add(enterTime);
-            AddInput(new AnimUnit(m_adapterPlayable.GetGraph(), clip, enterTime));
+            _clipLength.Add(clip.length);
+            _clipEnterTime.Add(enterTime);
+            AddInput(new AnimPlayer(m_adapterPlayable.GetGraph(), clip, enterTime));
         }
 
         public virtual void Select(int index)
@@ -63,11 +64,11 @@ namespace PlayableUtil.AnimationSystem
             base.Enable();
 
             if (currentIndex < 0) return;
-            m_mixer.SetInputWeight(currentIndex, 1f);
-            AnimHelper.Enable(m_mixer, currentIndex);
+            _mixerPlayable.SetInputWeight(currentIndex, 1f);
+            AnimHelper.Enable(_mixerPlayable, currentIndex);
 
-            m_mixer.SetTime(0f);
-            m_mixer.Play();
+            _mixerPlayable.SetTime(0f);
+            _mixerPlayable.Play();
             m_adapterPlayable.SetTime(0f);
             m_adapterPlayable.Play();
         }
@@ -76,10 +77,10 @@ namespace PlayableUtil.AnimationSystem
         {
             base.Disable();
             if (currentIndex < 0 || currentIndex >= clipCount) return;
-            m_mixer.SetInputWeight(currentIndex, 0f);
-            AnimHelper.Disable(m_mixer, currentIndex);
+            _mixerPlayable.SetInputWeight(currentIndex, 0f);
+            AnimHelper.Disable(_mixerPlayable, currentIndex);
             currentIndex = -1;
-            m_mixer.Pause();
+            _mixerPlayable.Pause();
             m_adapterPlayable.Pause();
         }
 
@@ -87,13 +88,13 @@ namespace PlayableUtil.AnimationSystem
         {
             if (currentIndex < 0 || currentIndex >= clipCount) return 0f;
 
-            return m_clipEnterTime[currentIndex];
+            return _clipEnterTime[currentIndex];
         }
 
         public override float GetAnimLength()
         {
             if (currentIndex < 0 || currentIndex >= clipCount) return 0f;
-            return m_clipLength[currentIndex];
+            return _clipLength[currentIndex];
         }
     }
 }

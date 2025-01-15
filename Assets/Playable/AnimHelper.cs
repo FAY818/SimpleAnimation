@@ -20,14 +20,14 @@ namespace PlayableUtil.AnimationSystem
         /// <param name="behaviour"></param>
         public static void SetOutput(PlayableGraph graph, Animator animator, AdapterBase behaviour)
         {
-            var root = new Root(graph);
+            var root = new AnimRoot(graph);
             root.AddInput(behaviour);
-            AnimationPlayableOutput.Create(graph, "Animation", animator).SetSourcePlayable(root.GetAdapterPlayable());
+            AnimationPlayableOutput.Create(graph, "PlayableOutput", animator).SetSourcePlayable(root.GetAdapterPlayable());
         }
 
         public static void Start(PlayableGraph graph)
         {
-            GetAdapter(graph.GetOutputByType<AnimationPlayableOutput>(0).GetSourcePlayable()).Enable(); // 激活root节点 
+            AdapterPlayableBehaviour(graph.GetOutputByType<AnimationPlayableOutput>(0).GetSourcePlayable()).Enable(); // 激活root节点 
             graph.Play();
         }
         public static void Start(PlayableGraph graph, AdapterBase root)
@@ -42,7 +42,7 @@ namespace PlayableUtil.AnimationSystem
         /// <param name="playable"></param>
         public static void Enable(Playable playable)
         {
-            GetAdapter(playable)?.Enable();
+            AdapterPlayableBehaviour(playable)?.Enable();
         }
         public static void Enable(AnimationMixerPlayable mixer, int index)
         {
@@ -55,7 +55,7 @@ namespace PlayableUtil.AnimationSystem
         /// <param name="playable"></param>
         public static void Disable(Playable playable)
         {
-            GetAdapter(playable)?.Disable();
+            AdapterPlayableBehaviour(playable)?.Disable();
         }
         
         
@@ -70,7 +70,7 @@ namespace PlayableUtil.AnimationSystem
         /// </summary>
         /// <param name="playable"></param>
         /// <returns></returns>
-        public static AdapterPlayableBehaviour GetAdapter(Playable playable)
+        public static AdapterPlayableBehaviour AdapterPlayableBehaviour(Playable playable)
         {
             // 检测 playable 对象的类型是否是AnimAdapter
             if (typeof(AdapterPlayableBehaviour).IsAssignableFrom(playable.GetPlayableType()))
