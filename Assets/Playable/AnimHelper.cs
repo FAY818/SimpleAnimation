@@ -18,7 +18,7 @@ namespace PlayableUtil.AnimationSystem
         /// <param name="graph"></param>
         /// <param name="animator"></param>
         /// <param name="behaviour"></param>
-        public static void SetOutput(PlayableGraph graph, Animator animator, AnimBehaviour behaviour)
+        public static void SetOutput(PlayableGraph graph, Animator animator, AdapterBase behaviour)
         {
             var root = new Root(graph);
             root.AddInput(behaviour);
@@ -30,28 +30,35 @@ namespace PlayableUtil.AnimationSystem
             GetAdapter(graph.GetOutputByType<AnimationPlayableOutput>(0).GetSourcePlayable()).Enable(); // 激活root节点 
             graph.Play();
         }
-        public static void Start(PlayableGraph graph, AnimBehaviour root)
+        public static void Start(PlayableGraph graph, AdapterBase root)
         {
             root.Enable();
             graph.Play();
         }
 
         /// <summary>
-        /// 激活
+        /// 激活 Playable - AdapterPlayableBehaviour - AdapterBase
         /// </summary>
         /// <param name="playable"></param>
         public static void Enable(Playable playable)
         {
             GetAdapter(playable)?.Enable();
         }
-        public static void Enable(AnimationMixerPlayable mixer,int index)
+        public static void Enable(AnimationMixerPlayable mixer, int index)
         {
             Enable(mixer.GetInput(index));
         }
+        
+        /// <summary>
+        /// 禁用
+        /// </summary>
+        /// <param name="playable"></param>
         public static void Disable(Playable playable)
         {
             GetAdapter(playable)?.Disable();
         }
+        
+        
         public static void Disable(AnimationMixerPlayable mixer, int index)
         {
             Disable(mixer.GetInput(index));
@@ -63,12 +70,12 @@ namespace PlayableUtil.AnimationSystem
         /// </summary>
         /// <param name="playable"></param>
         /// <returns></returns>
-        public static AnimAdapter GetAdapter(Playable playable)
+        public static AdapterPlayableBehaviour GetAdapter(Playable playable)
         {
             // 检测 playable 对象的类型是否是AnimAdapter
-            if (typeof(AnimAdapter).IsAssignableFrom(playable.GetPlayableType()))
+            if (typeof(AdapterPlayableBehaviour).IsAssignableFrom(playable.GetPlayableType()))
             {
-                return ((ScriptPlayable<AnimAdapter>)playable).GetBehaviour();
+                return ((ScriptPlayable<AdapterPlayableBehaviour>)playable).GetBehaviour();
             }
             return null;
         }
@@ -82,7 +89,7 @@ namespace PlayableUtil.AnimationSystem
 
         #region 其他动画处理
 
-        public static AnimationCurve GetAnimCurve(AnimationClip clip,string curveName)
+        public static AnimationCurve GetAnimCurve(AnimationClip clip, string curveName)
         {
             EditorCurveBinding[] curves = AnimationUtility.GetCurveBindings(clip);
             foreach (var curve in curves)

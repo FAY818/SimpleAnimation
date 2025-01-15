@@ -8,7 +8,7 @@ namespace PlayableUtil.AnimationSystem
     /// <summary>
     /// 动画选择器
     /// </summary>
-    public class AnimSelector : AnimBehaviour
+    public class AnimSelector : AdapterBase
     {
         public int currentIndex { get; protected set; } // 当前子节点
         public int clipCount { get; protected set; } // 子节点数量

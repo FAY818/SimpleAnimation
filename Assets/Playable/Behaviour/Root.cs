@@ -3,9 +3,9 @@
 namespace PlayableUtil.AnimationSystem
 {
     /// <summary>
-    /// 根节点，用以隔离输出与播放节点，避免直接播放playable输入。
+    /// 隔离输出与播放节点，避免直接播放playable输入。
     /// </summary>
-    public class Root : AnimBehaviour
+    public class Root : AdapterBase
     {
         public Root(PlayableGraph graph) : base(graph)
         {

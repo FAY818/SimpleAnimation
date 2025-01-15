@@ -38,7 +38,7 @@ namespace PlayableUtil.AnimationSystem
         public float enterTime;
     }
 
-    [CreateAssetMenu(fileName = "New Anim Setting", menuName = "GuGame/Animation/Anim Setting")]
+    [CreateAssetMenu(fileName = "New Anim Setting", menuName = "Playable/Animation/Anim Setting")]
     public class AnimSetting : ScriptableObject
     {
         public List<AnimParam> animParams;

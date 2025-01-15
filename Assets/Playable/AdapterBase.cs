@@ -4,22 +4,28 @@ using UnityEngine.Playables;
 namespace PlayableUtil.AnimationSystem
 {
     /// <summary>
-    /// 动画多态节点的基类，可以根据不同的实现类对外表现出不同的行为
+    /// 动画节点的行为类，可以根据不同的实现类对外表现出不同的行为
     /// 负责创建适配节点，并将自身注入到适配节点中
+    /// 注意区分此类与PlayableBehaviour的区别：
+    /// PlayableBehaviour是Playable节点持有的行为类。其中定义的是在Playable不同的生命周期或行为发生时的回调函数。
+    /// AnimBehaviour是AnimAdapter（PlayableBehaviour）中封装的行为类
     /// </summary>
-    public abstract class AnimBehaviour
+    public abstract class AdapterBase
     {
         public bool enable { get; private set; }
         public float remainTime { get; protected set; }
-        
-        protected Playable m_adapterPlayable; // 统一在基类中构造适配节点，适配节点是真实的Playable节点，区分与AnimAdapter类
+        protected Playable m_adapterPlayable;
         protected float m_enterTime;
         protected float m_animLength;
 
-        public AnimBehaviour(float enterTime = 0f) { m_enterTime = enterTime; }
-        public AnimBehaviour(PlayableGraph graph, float enterTime = 0f)
+        public AdapterBase(float enterTime = 0f)
         {
-            m_adapterPlayable = ScriptPlayable<AnimAdapter>.Create(graph); // 创建适配节点
+            m_enterTime = enterTime;
+        }
+        
+        public AdapterBase(PlayableGraph graph, float enterTime = 0f)
+        {
+            m_adapterPlayable = ScriptPlayable<AdapterPlayableBehaviour>.Create(graph); // 创建适配节点
             AnimHelper.GetAdapter(m_adapterPlayable).Init(this); // 注入自己到适配节点
             m_enterTime = enterTime;
             m_animLength = float.NaN;
@@ -41,7 +47,7 @@ namespace PlayableUtil.AnimationSystem
         public virtual void Execute(Playable playable, FrameData info)
         {
             if (!enable) return;
-            remainTime = remainTime > 0f? remainTime - info.deltaTime: 0f;
+            remainTime = remainTime > 0f? remainTime - info.deltaTime: 0f; // 动画的剩余时间 - 帧间隔时间
         }
 
         /// <summary>
@@ -56,7 +62,7 @@ namespace PlayableUtil.AnimationSystem
         /// 将一个AnimBehaviour持有的Playable节点与自身持有的Playable节点相连
         /// </summary>
         /// <param name="behaviour"></param>
-        public void AddInput(AnimBehaviour behaviour) 
+        public void AddInput(AdapterBase behaviour) 
         {
             AddInput(behaviour.GetAdapterPlayable());
         }
@@ -74,6 +80,5 @@ namespace PlayableUtil.AnimationSystem
         {
             return m_animLength;
         }
-
     }
 }

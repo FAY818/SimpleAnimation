@@ -7,7 +7,7 @@ namespace PlayableUtil.AnimationSystem
     /// <summary>
     /// 动画播放单元
     /// </summary>
-    public class AnimUnit : AnimBehaviour
+    public class AnimUnit : AdapterBase
     {
         private AnimationClipPlayable m_animClip;
 

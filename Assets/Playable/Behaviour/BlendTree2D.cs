@@ -11,7 +11,7 @@ namespace PlayableUtil.AnimationSystem
         public Vector2 pos;
     }
 
-    public class BlendTree2D : AnimBehaviour
+    public class BlendTree2D : AdapterBase
     {
         private struct DataPair
         {

@@ -3,14 +3,15 @@
 namespace PlayableUtil.AnimationSystem
 {
     /// <summary>
-    /// 动画适配器节点，将继承的 PlayableBehaviour 接口和持有的自定义的AnimBehaviour类适配以实现节点的多态；
-    /// 注意AnimAdapter并不是真实的Playable节点，真实的Playable节点在AnimBehaviour中创建；
+    /// 自定义的ScriptPlayable<AdapterPlayableBehaviour>对象所持有的行为类
+    /// AnimAdapter是对于AnimBehaviour类型的封装，AnimBehaviour通过子类的不同实现表现多态；
+    /// 注意AnimAdapter并不是真实的Playable节点，他是父Playable节点的行为类，子Playable节点在AnimBehaviour中创建；
     /// </summary>
-    public class AnimAdapter : PlayableBehaviour
+    public class AdapterPlayableBehaviour : PlayableBehaviour
     {
-        private AnimBehaviour m_behaviour;
+        private AdapterBase m_behaviour;
 
-        public void Init(AnimBehaviour behaviour)
+        public void Init(AdapterBase behaviour)
         {
             m_behaviour = behaviour;
         }
@@ -35,7 +36,7 @@ namespace PlayableUtil.AnimationSystem
             m_behaviour?.Execute(playable, info);
         }
 
-        public T GetAnimBehaviour<T>() where T:AnimBehaviour
+        public T GetAnimBehaviour<T>() where T:AdapterBase
         {
             return m_behaviour as T;
         }

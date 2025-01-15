@@ -8,7 +8,7 @@ namespace PlayableUtil.AnimationSystem
     /// <summary>
     /// 动画过渡混合器
     /// </summary>
-    public class Mixer : AnimBehaviour
+    public class Mixer : AdapterBase
     {
         public int inputCount { get; private set; }
         public int currentIndex => m_currentIndex;
@@ -178,7 +178,7 @@ namespace PlayableUtil.AnimationSystem
 
         private float GetTargetEnterTime(int index)
         {
-            return ((ScriptPlayable<AnimAdapter>)m_animMixer.GetInput(index)).GetBehaviour().GetAnimEnterTime();
+            return ((ScriptPlayable<AdapterPlayableBehaviour>)m_animMixer.GetInput(index)).GetBehaviour().GetAnimEnterTime();
         }
 
         private float ModifyWeight(int index,float delta)
