@@ -14,8 +14,14 @@ namespace PlayableUtil.AnimationSystem
     {
         public bool enable { get; private set; }
         public float remainTime { get; protected set; }
-        protected Playable m_adapterPlayable; // 行为类中的Playable节点，
-        protected float m_enterTime; // todo : 这个时间暂时没有用处？
+        /// <summary>
+        /// 每一个适配类都会持有一个Playable节点，用于将自己与其他Playable节点连接
+        /// </summary>
+        protected Playable m_adapterPlayable;
+        /// <summary>
+        /// 动画过渡的时间
+        /// </summary>
+        protected float m_enterTime;
         protected float m_animLength;
 
         public AdapterBase(float enterTime = 0f)
@@ -44,7 +50,7 @@ namespace PlayableUtil.AnimationSystem
         }
         public virtual void Stop() { }
         
-        public virtual void Execute(Playable playable, FrameData info)
+        public virtual void OnPrepareFrame(Playable playable, FrameData info)
         {
             if (!enable) return;
             remainTime = remainTime > 0f? remainTime - info.deltaTime: 0f; // 动画的剩余时间 - 帧间隔时间

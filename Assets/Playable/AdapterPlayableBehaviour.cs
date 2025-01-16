@@ -33,7 +33,7 @@ namespace PlayableUtil.AnimationSystem
         /// <param name="info"></param>
         public override void PrepareFrame(Playable playable, FrameData info)
         {
-            m_behaviour?.Execute(playable, info);
+            m_behaviour?.OnPrepareFrame(playable, info);
         }
 
         public T GetAnimBehaviour<T>() where T:AdapterBase
