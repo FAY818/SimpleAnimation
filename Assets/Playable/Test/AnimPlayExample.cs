@@ -23,7 +23,7 @@ namespace PlayableUtil.AnimationSystem
         {
             if(Input.GetKeyDown(KeyCode.Space))
             {
-                if (m_AnimPlayer.enable)
+                if (m_AnimPlayer.IsEnable)
                     m_AnimPlayer.Disable();
                 else
                     m_AnimPlayer.Enable();

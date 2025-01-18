@@ -10,10 +10,11 @@ namespace PlayableUtil.AnimationSystem
     /// </summary>
     public class AnimSelector : AdapterBase
     {
-        public int currentIndex { get; protected set; } // 当前动画clip的索引
+        public int currentIndex { get; protected set; } // 当前端口
+        
         public int clipCount { get; protected set; } 
 
-        private AnimationMixerPlayable _mixerPlayable; // 动画混合器
+        protected AnimationMixerPlayable _mixerPlayable; // 动画混合器
         private List<float> _clipLength;
         private List<float> _clipEnterTime;
 
@@ -49,6 +50,10 @@ namespace PlayableUtil.AnimationSystem
             AddInput(new AnimPlayer(m_adapterPlayable.GetGraph(), clip, enterTime));
         }
 
+        /// <summary>
+        /// todo：如果在enable时修改内部索引，可能会导致不能正常断开旧连接
+        /// </summary>
+        /// <param name="index"></param>
         public virtual void Select(int index)
         {
             currentIndex = index;
@@ -64,6 +69,7 @@ namespace PlayableUtil.AnimationSystem
             base.Enable();
 
             if (currentIndex < 0) return;
+            
             _mixerPlayable.SetInputWeight(currentIndex, 1f);
             AnimHelper.Enable(_mixerPlayable, currentIndex);
 
@@ -76,6 +82,7 @@ namespace PlayableUtil.AnimationSystem
         public override void Disable()
         {
             base.Disable();
+            
             if (currentIndex < 0 || currentIndex >= clipCount) return;
             _mixerPlayable.SetInputWeight(currentIndex, 0f);
             AnimHelper.Disable(_mixerPlayable, currentIndex);

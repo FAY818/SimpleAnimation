@@ -14,10 +14,13 @@ namespace PlayableUtil.AnimationSystem
         {
             if (clipCount <= 1)
             {
-                return 0;
+                currentIndex = 0;
+            }
+            else
+            {
+                currentIndex = Random.Range(0, clipCount);
             }
             
-            currentIndex = Random.Range(0, clipCount);
             return currentIndex;
         }
     } 

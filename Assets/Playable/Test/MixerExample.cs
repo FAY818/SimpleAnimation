@@ -6,53 +6,54 @@ namespace PlayableUtil.AnimationSystem
     public class MixerExample : MonoBehaviour
     {
         public AnimationClip[] clips;
-        public bool canInteruptTransition = true;
+        //public bool canInteruptTransition = true;
         public float totalWeight;
 
-        private PlayableGraph m_graph;
-        private AnimMixer m_AnimMixer;
+        private PlayableGraph _graph;
+        private AnimMixer _AnimMixer;
 
         private void Start()
         {
-            m_graph = PlayableGraph.Create();
-            var animUnit1 = new AnimPlayer(m_graph, clips[0], 0.1f);
-            var animUnit2 = new AnimPlayer(m_graph, clips[1], 0.1f);
-            var animUnit3 = new AnimPlayer(m_graph, clips[2], 0.1f);
-            m_AnimMixer = new AnimMixer(m_graph);
-            m_AnimMixer.AddInput(animUnit1);
-            m_AnimMixer.AddInput(animUnit2);
-            m_AnimMixer.AddInput(animUnit3);
+            _graph = PlayableGraph.Create();
+            var animUnit1 = new AnimPlayer(_graph, clips[0], 0.1f);
+            var animUnit2 = new AnimPlayer(_graph, clips[1], 0.1f);
+            var animUnit3 = new AnimPlayer(_graph, clips[2], 0.1f);
+            _AnimMixer = new AnimMixer(_graph);
+            _AnimMixer.AddInput(animUnit1);
+            _AnimMixer.AddInput(animUnit2);
+            _AnimMixer.AddInput(animUnit3);
 
-            AnimHelper.SetOutput(m_graph, GetComponent<Animator>(), m_AnimMixer);
-            AnimHelper.Start(m_graph);
+            AnimHelper.SetOutput(_graph, GetComponent<Animator>(), _AnimMixer);
+            AnimHelper.Start(_graph);
         }
 
         private void Update()
         {
-            if(UnityEngine.Input.GetKey(KeyCode.X))
+            if(Input.GetKey(KeyCode.X))
             {
-                m_AnimMixer.TransitionTo(0);
+                _AnimMixer.TransitionTo(0);
             }
-            else if(UnityEngine.Input.GetKey(KeyCode.C))
+            else if(Input.GetKey(KeyCode.C))
             {
-                m_AnimMixer.TransitionTo(1);
+                _AnimMixer.TransitionTo(1);
             }
-            else if (UnityEngine.Input.GetKey(KeyCode.V))
+            else if (Input.GetKey(KeyCode.V))
             {
-                m_AnimMixer.TransitionTo(2);
+                _AnimMixer.TransitionTo(2);
             }
 
             totalWeight = 0f;
             for (int i = 0; i < clips.Length; i++)
             {
-                totalWeight += m_AnimMixer.GetWeight(i);
+                totalWeight += _AnimMixer.GetWeight(i);
             }
-            if (totalWeight > 1f) Debug.Log($"权重超出1: {totalWeight}");
+            if (totalWeight > 1f) 
+                Debug.Log($"权重超出1: {totalWeight}");
         }
 
         private void OnDisable()
         {
-            m_graph.Destroy();
+            _graph.Destroy();
         }
     }
 }

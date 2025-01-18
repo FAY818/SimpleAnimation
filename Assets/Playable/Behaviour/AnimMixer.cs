@@ -115,7 +115,7 @@ namespace PlayableUtil.AnimationSystem
         {
             base.OnPrepareFrame(playable, info);
 
-            if (!enable) return; 
+            if (!IsEnable) return; 
             if (!_isTransition || _targetIndex < 0) return;
 
             if (_timeToNext > 0f)
@@ -146,10 +146,10 @@ namespace PlayableUtil.AnimationSystem
                 SetWeight(_targetIndex, 1f - _declinedWeight);
                 return;
             }
-            // 过渡结束
-            _isTransition = false;
             // 断开当前端口的动画
             AnimHelper.Disable(_animMixer, _currentIndex);
+            // 过渡结束
+            _isTransition = false;
             // 更新当前端口号
             _currentIndex = _targetIndex;
             _targetIndex = -1;

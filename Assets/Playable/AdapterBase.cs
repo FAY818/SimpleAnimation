@@ -12,8 +12,8 @@ namespace PlayableUtil.AnimationSystem
     /// </summary>
     public abstract class AdapterBase
     {
-        public bool enable { get; private set; }
-        public float remainTime { get; protected set; }
+        public bool IsEnable { get; private set; }
+        public float RemainTime { get; protected set; }
         /// <summary>
         /// 每一个适配类都会持有一个Playable节点，用于将自己与其他Playable节点连接
         /// </summary>
@@ -39,21 +39,22 @@ namespace PlayableUtil.AnimationSystem
 
         public virtual void Enable() 
         { 
-            if (enable) return;
-            enable = true;
-            remainTime = GetAnimLength();
+            if (IsEnable) return;
+            IsEnable = true;
+            RemainTime = GetAnimLength();
         }
         public virtual void Disable() 
         {
-            if (!enable) return;
-            enable = false; 
+            if (!IsEnable) return;
+            IsEnable = false;
+            RemainTime = 0f;
         }
         public virtual void Stop() { }
         
         public virtual void OnPrepareFrame(Playable playable, FrameData info)
         {
-            if (!enable) return;
-            remainTime = remainTime > 0f? remainTime - info.deltaTime: 0f; // 动画的剩余时间 - 帧间隔时间
+            if (!IsEnable) return;
+            RemainTime = RemainTime > 0f? RemainTime - info.deltaTime: 0f; // 动画的剩余时间 - 帧间隔时间
         }
 
         /// <summary>

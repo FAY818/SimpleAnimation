@@ -31,7 +31,7 @@ namespace PlayableUtil.AnimationSystem
         {
             if(Input.GetKeyDown(KeyCode.Space))
             {
-                if(_selector.enable)
+                if(_selector.IsEnable)
                 {
                     _selector.Disable();
                 }
@@ -42,7 +42,7 @@ namespace PlayableUtil.AnimationSystem
                 }
             }
 
-            remainTime = _selector.remainTime;
+            remainTime = _selector.RemainTime;
         }
 
         private int Select()

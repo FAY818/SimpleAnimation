@@ -26,7 +26,7 @@ namespace PlayableUtil.AnimationSystem
                 _randomSelector.AddInput(clips[i], 0.5f);
             }
             m_AnimMixer.AddInput(anim1);
-            m_AnimMixer.AddInput(_randomSelector);
+            m_AnimMixer.AddInput(_randomSelector); 
 
             AnimHelper.SetOutput(_graph, GetComponent<Animator>(), m_AnimMixer);
             AnimHelper.Start(_graph);
@@ -34,16 +34,29 @@ namespace PlayableUtil.AnimationSystem
 
         private void Update()
         {
+            isTransition = m_AnimMixer.IsTransition;
             if(Input.GetKeyDown(KeyCode.Space))
             {
-                _randomSelector.Select(); // 随机选择一个动画
-                m_AnimMixer.TransitionTo(1); // 过渡到当前的随机动画端口
+                if (m_AnimMixer.CurrentIndex == 1)
+                {
+                    _randomSelector.Disable();
+                    _randomSelector.Select();
+                    _randomSelector.Enable();
+                }
+                else
+                {
+                    // 如果运行时连续点击空格，频繁调用一下方法会造成_randomSelector的索引被修改，这会造成权重设置的混乱，需要以上if分支
+                    _randomSelector.Select();
+                    m_AnimMixer.TransitionTo(1); // 过渡到当前的随机动画端口
+                }
             }
+            
             isTransition = m_AnimMixer.IsTransition;
-            remainingTime = _randomSelector.remainTime;
-            if(!m_AnimMixer.IsTransition && _randomSelector.remainTime <= 0.5f)
+            remainingTime = _randomSelector.RemainTime;
+            if(!m_AnimMixer.IsTransition && _randomSelector.RemainTime <= 0.5f)
             {
-                m_AnimMixer.TransitionTo(0); // 过渡到默认动画
+                // 不在过渡中，并且随机动画播放时间小于0.5f
+                m_AnimMixer.TransitionTo(0);
             }
         }
 

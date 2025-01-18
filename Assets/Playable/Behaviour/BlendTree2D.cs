@@ -10,57 +10,78 @@ namespace PlayableUtil.AnimationSystem
         public AnimationClip clip;
         public Vector2 pos;
     }
-
+    
     public class BlendTree2D : AdapterBase
     {
+        /// <summary>
+        /// 对应shader中的计算结构
+        /// </summary>
         private struct DataPair
         {
-            public float x; // 混合坐标x
-            public float y; // 混合坐标y
-            public float output; // 计算输出动画权重
+            public float x; // 对应BlendClip2D.pos.x
+            public float y; // 对应BlendClip2D.pos.y
+            public float output; // 输出动画权重
         }
 
-        private AnimationMixerPlayable m_mixer;
-        private Vector2 m_pointer;
-        private float m_total;
-        private int m_clipCount;
+        private AnimationMixerPlayable _mixer;
+        /// <summary>
+        /// 当前坐标位置
+        /// </summary>
+        private Vector2 _pointer;
+        /// <summary>
+        /// 所有输入源动画的权重和
+        /// </summary>
+        private float _total;
+        private int _clipCount;
 
-        private ComputeShader m_computeShader; // 计算权重的shader
-        private ComputeBuffer m_computeBuffer; // 传递数据
-        private DataPair[] m_datas;
-        private int m_kernel;
-        private int m_pointerX;
-        private int m_pointerY;
+        /// <summary>
+        /// 计算权重的shader
+        /// </summary>
+        private ComputeShader _computeShader;
+        /// <summary>
+        /// 与动画相关的计算数据结构
+        /// </summary>
+        private DataPair[] _datas;
+        /// <summary>
+        /// 与shader传递数据的缓冲区
+        /// </summary>
+        private ComputeBuffer _computeBuffer;
+        /// <summary>
+        /// shader中的计算主函数Compute
+        /// </summary>
+        private int _kernel;
+        private int _pointerX;
+        private int _pointerY;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="graph"></param>
-        /// <param name="clips"></param>
+        /// <param name="clips">自定义的动画结构，包含AnimationClip以及对应的坐标</param>
         /// <param name="enterTime"></param>
         /// <param name="eps">防止分母为0，当其作为分母时，权重经过标准归一化处理会是1</param>
         public BlendTree2D(PlayableGraph graph, BlendClip2D[] clips, float enterTime = 0f, float eps = 1e-5f): base(graph, enterTime)
         {
-            m_datas = new DataPair[clips.Length];
+            _datas = new DataPair[clips.Length];
 
-            m_mixer = AnimationMixerPlayable.Create(graph);
-            m_adapterPlayable.AddInput(m_mixer, 0, 1f);
+            _mixer = AnimationMixerPlayable.Create(graph);
+            m_adapterPlayable.AddInput(_mixer, 0, 1f);
             for (int i = 0; i < clips.Length; i++)
             {
-                m_mixer.AddInput(AnimationClipPlayable.Create(graph, clips[i].clip), 0);
-                m_datas[i].x = clips[i].pos.x;
-                m_datas[i].y = clips[i].pos.y;
+                _mixer.AddInput(AnimationClipPlayable.Create(graph, clips[i].clip), 0);
+                _datas[i].x = clips[i].pos.x;
+                _datas[i].y = clips[i].pos.y;
             }
 
-            m_computeShader = AnimHelper.GetComputer("Blend2D");
-            m_computeBuffer = new ComputeBuffer(clips.Length, 12); // 4的倍数
-            m_kernel = m_computeShader.FindKernel("Compute"); // shader中定义的计算主函数
-            m_computeShader.SetBuffer(m_kernel, "dataBuffer", m_computeBuffer);
-            m_computeShader.SetFloat("eps", eps);
-            m_pointerX = Shader.PropertyToID("pointerX");
-            m_pointerY = Shader.PropertyToID("pointerY");
-            m_clipCount = clips.Length;
-            m_pointer.Set(1, 1);
+            _computeShader = AnimHelper.GetComputer("Blend2D");
+            _computeBuffer = new ComputeBuffer(clips.Length, 12); // 4的倍数
+            _kernel = _computeShader.FindKernel("Compute");
+            _computeShader.SetBuffer(_kernel, "dataBuffer", _computeBuffer);
+            _computeShader.SetFloat("eps", eps);
+            _pointerX = Shader.PropertyToID("pointerX");
+            _pointerY = Shader.PropertyToID("pointerY");
+            _clipCount = clips.Length;
+            _pointer.Set(1, 1);
             SetPointer(0, 0);
 
             Disable();
@@ -73,28 +94,28 @@ namespace PlayableUtil.AnimationSystem
         }
         public void SetPointer(float x, float y)
         {
-            if(m_pointer.x == x && m_pointer.y == y)
+            if(_pointer.x == x && _pointer.y == y)
             {
                 return;
             }
-            m_pointer.Set(x, y);
+            _pointer.Set(x, y);
 
             int i;
-            m_computeShader.SetFloat(m_pointerX, x);
-            m_computeShader.SetFloat(m_pointerY, y);
+            _computeShader.SetFloat(_pointerX, x);
+            _computeShader.SetFloat(_pointerY, y);
 
-            m_computeBuffer.SetData(m_datas);
-            m_computeShader.Dispatch(m_kernel, m_clipCount, 1, 1);
-            m_computeBuffer.GetData(m_datas);
-            for (i = 0; i < m_clipCount; i++)
+            _computeBuffer.SetData(_datas);
+            _computeShader.Dispatch(_kernel, _clipCount, 1, 1);
+            _computeBuffer.GetData(_datas);
+            for (i = 0; i < _clipCount; i++)
             {
-                m_total += m_datas[i].output;
+                _total += _datas[i].output;
             }
-            for (i = 0; i < m_clipCount; i++)
+            for (i = 0; i < _clipCount; i++)
             {
-                m_mixer.SetInputWeight(i, m_datas[i].output / m_total);
+                _mixer.SetInputWeight(i, _datas[i].output / _total);
             }
-            m_total = 0f;
+            _total = 0f;
         }
 
         public override void Enable()
@@ -102,27 +123,25 @@ namespace PlayableUtil.AnimationSystem
             base.Enable();
 
             SetPointer(0, 0);
-            for (int i = 0; i < m_clipCount; i++)
+            for (int i = 0; i < _clipCount; i++)
             {
-                m_mixer.GetInput(i).Play();
-                m_mixer.GetInput(i).SetTime(0f);
+                _mixer.GetInput(i).Play();
+                _mixer.GetInput(i).SetTime(0f);
             }
-            m_mixer.SetTime(0f);
-            m_mixer.Play();
+            _mixer.SetTime(0f);
+            _mixer.Play();
             m_adapterPlayable.SetTime(0f);
             m_adapterPlayable.Play();
-
-            //m_animLength = ((AnimationClipPlayable)m_mixer.GetInput(0)).GetAnimationClip().length;
         }
 
         public override void Disable()
         {
             base.Disable();
-            for (int i = 0; i < m_clipCount; i++)
+            for (int i = 0; i < _clipCount; i++)
             {
-                m_mixer.GetInput(i).Pause();
+                _mixer.GetInput(i).Pause();
             }
-            m_mixer.Pause();
+            _mixer.Pause();
             m_adapterPlayable.Pause();
         }
 
@@ -132,7 +151,7 @@ namespace PlayableUtil.AnimationSystem
         public override void Stop()
         {
             base.Stop();
-            m_computeBuffer.Dispose();
+            _computeBuffer.Dispose();
         }
     }
 }
