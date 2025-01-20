@@ -272,7 +272,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1176542971}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0019322938bda4fef8c3c19aad4a413f, type: 3}
   m_Name: 
@@ -287,7 +287,45 @@ MonoBehaviour:
     pos: {x: -1, y: 0}
   - clip: {fileID: 7400000, guid: dbc663f7e83140241a679da3ca9063b7, type: 3}
     pos: {x: 1, y: 0}
-  shader: {fileID: 7200000, guid: 559d92bd7f9f343a599d3dc9dd836a1e, type: 3}
+--- !u!114 &1176542985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1176542971}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d31c9bf2cceb48859b55c72567cbce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clipA: {fileID: 7400000, guid: 26055e26f15260e4e8e0e51f50c41926, type: 3}
+  clipB: {fileID: 7400000, guid: 1e79f5e733df84044a45d6ab05035627, type: 3}
+  clipC: {fileID: 7400000, guid: d6fd0c7048894427c8663615237d6a77, type: 3}
+  clipAWeight: 0
+  clipBWeight: 0
+  clipCWeight: 1
+  bodyAvatarMask: {fileID: 31900000, guid: b6cca8cd19b284c779d93eaa43f565d7, type: 2}
+--- !u!114 &1176542986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1176542971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ef25bd7e0f46bda46044856443b5aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layerData:
+  - weight: 1
+    avatarmask: {fileID: 0}
+  - weight: 1
+    avatarmask: {fileID: 31900000, guid: b6cca8cd19b284c779d93eaa43f565d7, type: 2}
+  clips:
+  - {fileID: 7400000, guid: 26055e26f15260e4e8e0e51f50c41926, type: 3}
+  - {fileID: 7400000, guid: 1e79f5e733df84044a45d6ab05035627, type: 3}
 --- !u!1001 &1396969163
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -10,9 +10,9 @@ namespace PlayableUtil.AnimationSystem
     /// </summary>
     public class AnimSelector : AdapterBase
     {
-        public int currentIndex { get; protected set; } // 当前端口
+        public int CurrentIndex { get; protected set; } // 当前端口
         
-        public int clipCount { get; protected set; } 
+        public int ClipCount { get; protected set; } 
 
         protected AnimationMixerPlayable _mixerPlayable; // 动画混合器
         private List<float> _clipLength;
@@ -23,7 +23,7 @@ namespace PlayableUtil.AnimationSystem
             _mixerPlayable = AnimationMixerPlayable.Create(graph);
             m_adapterPlayable.AddInput(_mixerPlayable, 0, 1f); // 将自身的自定义可播放项与动画混合器连接
 
-            currentIndex = -1;
+            CurrentIndex = -1;
             _clipLength = new List<float>();
             _clipEnterTime = new List<float>();
         }
@@ -38,10 +38,10 @@ namespace PlayableUtil.AnimationSystem
 
         public override void AddInput(Playable playable)
         {
-            base.AddInput(playable); // todo 检测是否是调用2遍
-            _mixerPlayable.SetInputCount(clipCount + 1);
-            _mixerPlayable.ConnectInput(clipCount, playable, 0, 0f);
-            clipCount++;
+            base.AddInput(playable);
+            _mixerPlayable.SetInputCount(ClipCount + 1);
+            _mixerPlayable.ConnectInput(ClipCount, playable, 0, 0f);
+            ClipCount++;
         }
         public void AddInput(AnimationClip clip, float enterTime = 0f)
         {
@@ -56,22 +56,22 @@ namespace PlayableUtil.AnimationSystem
         /// <param name="index"></param>
         public virtual void Select(int index)
         {
-            currentIndex = index;
+            CurrentIndex = index;
         }
         public virtual int Select()
         {
-            currentIndex = 0;
-            return currentIndex;
+            CurrentIndex = 0;
+            return CurrentIndex;
         }
 
         public override void Enable()
         {
             base.Enable();
 
-            if (currentIndex < 0) return;
+            if (CurrentIndex < 0) return;
             
-            _mixerPlayable.SetInputWeight(currentIndex, 1f);
-            AnimHelper.Enable(_mixerPlayable, currentIndex);
+            _mixerPlayable.SetInputWeight(CurrentIndex, 1f);
+            AnimHelper.Enable(_mixerPlayable, CurrentIndex);
 
             _mixerPlayable.SetTime(0f);
             _mixerPlayable.Play();
@@ -83,25 +83,25 @@ namespace PlayableUtil.AnimationSystem
         {
             base.Disable();
             
-            if (currentIndex < 0 || currentIndex >= clipCount) return;
-            _mixerPlayable.SetInputWeight(currentIndex, 0f);
-            AnimHelper.Disable(_mixerPlayable, currentIndex);
-            currentIndex = -1;
+            if (CurrentIndex < 0 || CurrentIndex >= ClipCount) return;
+            _mixerPlayable.SetInputWeight(CurrentIndex, 0f);
+            AnimHelper.Disable(_mixerPlayable, CurrentIndex);
+            CurrentIndex = -1;
             _mixerPlayable.Pause();
             m_adapterPlayable.Pause();
         }
 
         public override float GetEnterTime()
         {
-            if (currentIndex < 0 || currentIndex >= clipCount) return 0f;
+            if (CurrentIndex < 0 || CurrentIndex >= ClipCount) return 0f;
 
-            return _clipEnterTime[currentIndex];
+            return _clipEnterTime[CurrentIndex];
         }
 
         public override float GetAnimLength()
         {
-            if (currentIndex < 0 || currentIndex >= clipCount) return 0f;
-            return _clipLength[currentIndex];
+            if (CurrentIndex < 0 || CurrentIndex >= ClipCount) return 0f;
+            return _clipLength[CurrentIndex];
         }
     }
 }

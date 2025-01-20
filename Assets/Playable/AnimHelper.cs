@@ -48,7 +48,12 @@ namespace PlayableUtil.AnimationSystem
         {
             Enable(mixer.GetInput(index));
         }
-        
+
+        public static void Enable(AnimationLayerMixerPlayable layerMixer, int index)
+        {
+            Enable(layerMixer.GetInput(index));
+        }
+
         /// <summary>
         /// 禁用
         /// </summary>
@@ -58,12 +63,16 @@ namespace PlayableUtil.AnimationSystem
             AdapterPlayableBehaviour(playable)?.Disable();
         }
         
-        
         public static void Disable(AnimationMixerPlayable mixer, int index)
         {
             Disable(mixer.GetInput(index));
         }
 
+        public static void Disable(AnimationLayerMixerPlayable layerMixer, int index)
+        {
+            Disable(layerMixer.GetInput(index));
+        }
+        
         /// <summary>
         /// 获取playable对象上的AnimAdapter(行为类)
         /// Playable -> PlayableHandle -> IPlayableBehaviour

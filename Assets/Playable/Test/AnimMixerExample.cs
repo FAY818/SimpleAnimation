@@ -3,7 +3,7 @@ using UnityEngine.Playables;
 
 namespace PlayableUtil.AnimationSystem
 {
-    public class MixerExample : MonoBehaviour
+    public class AnimMixerExample : MonoBehaviour
     {
         public AnimationClip[] clips;
         //public bool canInteruptTransition = true;
